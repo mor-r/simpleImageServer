@@ -19,7 +19,7 @@ public class DBUtil {
 
     public static DataSource getDataSource(){
         //通过这个方法创建 DataSource 的实例
-        if(dataSource==null){//②双重判断
+        if(dataSource==null){//②双重判断（加锁操作是一种比较耗时、低效的操作，双重判断就是希望不要频繁的操作）
             synchronized (DBUtil.class){//①加锁
                 if(dataSource==null){
                     dataSource=new MysqlDataSource();
@@ -33,7 +33,7 @@ public class DBUtil {
         return dataSource;
     }
 
-    public static Connection getConnection() {
+    public static Connection getConnection() {//获取数据库连接对象
         try {
             return getDataSource().getConnection();
         } catch (SQLException e) {
@@ -42,6 +42,7 @@ public class DBUtil {
         return null;
     }
 
+    //进行关闭操作（顺序很重要，先打开的后关闭）
     public static void close(Connection connection, PreparedStatement statement, ResultSet resultSet) {
         try {
             if(resultSet!=null){
